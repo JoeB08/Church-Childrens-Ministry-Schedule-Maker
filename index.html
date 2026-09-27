@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nursery Rota</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Source+Sans+3:wght@400;500;600&display=swap">
+<style>
+:root{color-scheme:light;}
+body{margin:0}
+:root{
+  --bg:#F3F5F7; --surface:#FFFFFF; --ink:#1B2733; --muted:#5B6B7A; --line:#D9E0E6;
+  --accent:#0E7C86; --accent-ink:#FFFFFF; --lead:#2F4B9A; --lead-bg:#E4EAF8;
+  --help:#0E6B73; --help-bg:#DFF1F2; --warn:#B4471C; --warn-bg:#FBE9E0; --field:#FBFCFD;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#10181F; --surface:#172530; --ink:#E6EDF2; --muted:#93A4B3; --line:#2A3B48;
+    --accent:#4FC3CE; --accent-ink:#0B1A1D; --lead:#9DB1F2; --lead-bg:#22305A;
+    --help:#7FD6DE; --help-bg:#153B40; --warn:#F0916A; --warn-bg:#3B2318; --field:#12202A;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#10181F; --surface:#172530; --ink:#E6EDF2; --muted:#93A4B3; --line:#2A3B48;
+  --accent:#4FC3CE; --accent-ink:#0B1A1D; --lead:#9DB1F2; --lead-bg:#22305A;
+  --help:#7FD6DE; --help-bg:#153B40; --warn:#F0916A; --warn-bg:#3B2318; --field:#12202A;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.45 var(--body);padding-inline:16px;padding-block:24px 48px}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:28px;line-height:1.1}
+h2{font-size:18px}
+header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+header p{margin:6px 0 0;color:var(--muted);max-width:60ch}
+.grid{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+input,select,button,textarea{font:inherit;color:var(--ink)}
+input[type=text],input[type=date],input[type=number],select,textarea{background:var(--field);border:1px solid var(--line);border-radius:6px;padding:7px 9px;font-size:14px;text-transform:none;letter-spacing:0;font-weight:400;width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:14px}
+.check input{margin-top:3px;accent-color:var(--accent)}
+button{cursor:pointer;border-radius:6px;border:1px solid var(--line);background:var(--surface);padding:7px 12px;font-size:14px;font-weight:500}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600;padding:9px 16px}
+button.ghost{border-color:transparent;color:var(--muted);padding:4px 8px;font-size:13px}
+button.ghost:hover{color:var(--warn);border-color:transparent}
+.vols{display:flex;flex-direction:column;gap:10px}
+.vol{border:1px solid var(--line);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:8px;background:var(--field)}
+.vol-top{display:flex;gap:8px;align-items:center}
+.vol-top input[type=text]{flex:1;min-width:0}
+.vol-opts{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-size:13px;color:var(--muted)}
+.vol-opts input[type=number]{width:56px;padding:4px 6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--warn-bg);color:var(--warn);border-radius:999px;padding:2px 4px 2px 9px;font-size:12px;font-weight:600}
+.chip button{border:0;background:transparent;color:inherit;padding:0 5px;font-size:15px;line-height:1}
+.chips input[type=date]{width:auto;padding:3px 6px;font-size:12px}
+.hint{font-size:13px;color:var(--muted);margin:0}
+.banner{background:var(--help-bg);color:var(--help);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:500}
+.weeks{display:flex;flex-direction:column;gap:12px}
+.week{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.week-head{background:var(--bg);padding:8px 12px;font-family:var(--display);font-weight:600;font-size:15px;display:flex;justify-content:space-between;gap:8px}
+.week-head span{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted)}
+.svcs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.svc{padding:10px 12px;display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line)}
+.svc + .svc{border-left:1px solid var(--line)}
+@media (max-width:640px){.svc + .svc{border-left:0}}
+.svc-name{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.slot{display:flex;gap:8px;align-items:center}
+.tag{flex:none;width:52px;text-align:center;font-size:11px;font-weight:600;border-radius:4px;padding:2px 0;text-transform:uppercase;letter-spacing:.04em}
+.tag.lead{background:var(--lead-bg);color:var(--lead)}
+.tag.help{background:var(--help-bg);color:var(--help)}
+.slot select{padding:4px 6px;font-size:14px}
+.slot select.open{background:var(--warn-bg);border-color:var(--warn);color:var(--warn);font-weight:600}
+.load{display:flex;flex-direction:column;gap:6px}
+.load-row{display:grid;grid-template-columns:minmax(80px,140px) 1fr 28px;gap:8px;align-items:center;font-size:13px}
+.bar{height:8px;background:var(--bg);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:4px}
+.load-row b{font-variant-numeric:tabular-nums;text-align:right}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:6px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Nursery Rota</h1>
+      <p>List your volunteers and the dates they cannot serve, choose how many people each service needs, and build an even rotation. Change any name afterward with the dropdowns.</p>
+    </div>
+    <div class="actions">
+      <button id="btn-generate" class="primary" type="button">Build schedule</button>
+      <button id="btn-copy" type="button">Copy as text</button>
+    </div>
+  </header>
+
+  <div id="banner" class="banner" hidden>Example volunteers are loaded so you can see how it works. Replace them with your own team.</div>
+
+  <div class="grid">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <section class="panel" aria-labelledby="h-setup">
+        <h2 id="h-setup">Schedule setup</h2>
+        <div class="row">
+          <label class="f" for="s-start">First date<input id="s-start" type="date"></label>
+          <label class="f" for="s-weeks">Weeks<input id="s-weeks" type="number" min="1" max="26"></label>
+        </div>
+        <label class="f" for="s-svcs">Services (one per line)<textarea id="s-svcs" rows="2"></textarea></label>
+        <div class="row">
+          <label class="f" for="s-leads">Leads per service<input id="s-leads" type="number" min="0" max="6"></label>
+          <label class="f" for="s-helpers">Helpers per service<input id="s-helpers" type="number" min="0" max="10"></label>
+        </div>
+        <label class="check"><input id="s-one" type="checkbox"><span>Serve at most one service per Sunday</span></label>
+        <label class="check"><input id="s-back" type="checkbox"><span>Avoid serving two Sundays in a row when possible</span></label>
+        <p class="hint">Leads are volunteers marked as lead-qualified (for example, background-checked and trained). Leads can also fill helper spots.</p>
+      </section>
+
+      <section class="panel" aria-labelledby="h-vols">
+        <div class="panel-head">
+          <h2 id="h-vols">Volunteers</h2>
+          <div class="actions">
+            <button id="btn-add" type="button">Add volunteer</button>
+            <button id="btn-clear" class="ghost" type="button">Remove all</button>
+          </div>
+        </div>
+        <div id="vols" class="vols"></div>
+      </section>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+      <section class="panel" aria-labelledby="h-sched">
+        <div class="panel-head"><h2 id="h-sched">Schedule</h2><span id="status" class="hint"></span></div>
+        <div id="weeks" class="weeks"></div>
+        <textarea id="copybox" rows="8" hidden aria-label="Schedule text"></textarea>
+      </section>
+      <section class="panel" aria-labelledby="h-load">
+        <h2 id="h-load">Turns per volunteer</h2>
+        <div id="load" class="load"></div>
+      </section>
+    </div>
+  </div>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+(function(){
+  var KEY = "nursery-rota-v1";
+  var $ = function(id){ return document.getElementById(id); };
+  var uid = 0;
+  function nid(){ return "v" + (++uid) + Math.random().toString(36).slice(2,6); }
+
+  function iso(d){ return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+  function parse(s){ var p = s.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
+  function addDays(s, n){ var d = parse(s); d.setDate(d.getDate()+n); return iso(d); }
+  function pretty(s){ return parse(s).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"}); }
+  function short(s){ return parse(s).toLocaleDateString(undefined,{month:"short",day:"numeric"}); }
+  function nextSunday(){ var d = new Date(); d.setDate(d.getDate() + ((7 - d.getDay()) % 7 || 7)); return iso(d); }
+
+  function sample(){
+    var s = nextSunday();
+    var mk = function(n, lead, off){ return { id: nid(), name: n, lead: lead, max: 2, off: off || [] }; };
+    return [
+      mk("Maria Alvarez", true, [addDays(s,7)]),
+      mk("Daniel Okafor", true, [addDays(s,14), addDays(s,21)]),
+      mk("Priya Raman", true, []),
+      mk("Tom Becker", false, [addDays(s,0)]),
+      mk("Grace Lindqvist", false, []),
+      mk("Joel Nakamura", false, [addDays(s,28)]),
+      mk("Hannah Price", false, [addDays(s,7), addDays(s,14)]),
+      mk("Sam Whitfield", false, []),
+      mk("Lena Castillo", false, [])
+    ];
+  }
+
+  var state = {
+    settings: { start: nextSunday(), weeks: 8, services: ["9:00 AM","11:00 AM"], leads: 1, helpers: 2, one: true, back: true },
+    vols: sample(), example: true, schedule: null
+  };
+
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+  function load(){
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) {
+        var s = JSON.parse(raw);
+        if (s && s.settings && s.vols) state = s;
+      }
+    } catch(e){}
+  }
+
+  function toast(msg){
+    var t = $("toast"); t.textContent = msg; t.classList.add("on");
+    clearTimeout(toast.h); toast.h = setTimeout(function(){ t.classList.remove("on"); }, 2200);
+  }
+
+  function el(tag, attrs, kids){
+    var e = document.createElement(tag);
+    for (var k in (attrs||{})) {
+      if (k === "text") e.textContent = attrs[k];
+      else if (k === "class") e.className = attrs[k];
+      else if (k.slice(0,2) === "on") e.addEventListener(k.slice(2), attrs[k]);
+      else e.setAttribute(k, attrs[k]);
+    }
+    (kids||[]).forEach(function(c){ if (c) e.appendChild(c); });
+    return e;
+  }
+
+  function volById(id){ for (var i=0;i<state.vols.length;i++) if (state.vols[i].id === id) return state.vols[i]; return null; }
+
+  /* ---------- setup form ---------- */
+  function readSettings(){
+    var s = state.settings;
+    s.start = $("s-start").value || s.start;
+    s.weeks = Math.max(1, Math.min(26, parseInt($("s-weeks").value,10) || 1));
+    var svcs = $("s-svcs").value.split("\n").map(function(x){ return x.trim(); }).filter(Boolean);
+    s.services = svcs.length ? svcs : ["Service"];
+    s.leads = Math.max(0, parseInt($("s-leads").value,10) || 0);
+    s.helpers = Math.max(0, parseInt($("s-helpers").value,10) || 0);
+    s.one = $("s-one").checked;
+    s.back = $("s-back").checked;
+  }
+  function writeSettings(){
+    var s = state.settings;
+    $("s-start").value = s.start; $("s-weeks").value = s.weeks;
+    $("s-svcs").value = s.services.join("\n");
+    $("s-leads").value = s.leads; $("s-helpers").value = s.helpers;
+    $("s-one").checked = s.one; $("s-back").checked = s.back;
+  }
+
+  /* ---------- volunteers ---------- */
+  function renderVols(){
+    var box = $("vols"); box.textContent = "";
+    $("banner").hidden = !state.example;
+    if (!state.vols.length) box.appendChild(el("p", {class:"hint", text:"No volunteers yet. Use Add volunteer."}));
+    state.vols.forEach(function(v){
+      var nameIn = el("input", {type:"text", id:"n-"+v.id, value:v.name, placeholder:"Name", "aria-label":"Volunteer name",
+        oninput:function(e){ v.name = e.target.value; state.example = false; $("banner").hidden = true; save(); }});
+      nameIn.addEventListener("change", function(){ renderSchedule(); });
+      var rm = el("button", {class:"ghost", type:"button", text:"Remove", onclick:function(){
+        state.vols = state.vols.filter(function(x){ return x.id !== v.id; });
+        clearAssignments(v.id); save(); renderVols(); renderSchedule();
+      }});
+      var leadCb = el("input", {type:"checkbox", id:"l-"+v.id, onchange:function(e){ v.lead = e.target.checked; save(); renderSchedule(); }});
+      leadCb.checked = !!v.lead;
+      var maxIn = el("input", {type:"number", id:"m-"+v.id, min:"1", max:"6", value:String(v.max||2), "aria-label":"Maximum turns per month",
+        onchange:function(e){ v.max = Math.max(1, parseInt(e.target.value,10)||2); save(); }});
+      var chips = el("div", {class:"chips"});
+      (v.off||[]).slice().sort().forEach(function(d){
+        chips.appendChild(el("span", {class:"chip"}, [
+          document.createTextNode(short(d)),
+          el("button", {type:"button", "aria-label":"Remove "+short(d), text:"×", onclick:function(){
+            v.off = v.off.filter(function(x){ return x !== d; }); save(); renderVols(); renderSchedule();
+          }})
+        ]));
+      });
+      var addD = el("input", {type:"date", id:"d-"+v.id, "aria-label":"Add a date "+(v.name||"volunteer")+" cannot serve",
+        onchange:function(e){
+          var d = e.target.value;
+          if (d && (v.off||[]).indexOf(d) < 0) { v.off = (v.off||[]).concat(d); save(); renderVols(); renderSchedule(); }
+        }});
+      chips.appendChild(addD);
+      box.appendChild(el("div", {class:"vol"}, [
+        el("div", {class:"vol-top"}, [nameIn, rm]),
+        el("div", {class:"vol-opts"}, [
+          el("label", {class:"check", for:"l-"+v.id}, [leadCb, el("span", {text:"Lead-qualified"})]),
+          el("label", {for:"m-"+v.id}, [document.createTextNode("Max per month "), maxIn])
+        ]),
+        el("div", {}, [el("div", {class:"hint", text:"Cannot serve on:", style:"margin-bottom:4px"}), chips])
+      ]));
+    });
+  }
+
+  /* ---------- generation ---------- */
+  function clearAssignments(id){
+    if (!state.schedule) return;
+    state.schedule.forEach(function(w){ w.svcs.forEach(function(s){ s.slots.forEach(function(sl){ if (sl.vid === id) sl.vid = null; }); }); });
+  }
+
+  function generate(){
+    readSettings();
+    var s = state.settings;
+    var counts = {}, monthCounts = {}, last = {};
+    state.vols.forEach(function(v){ counts[v.id] = 0; last[v.id] = -9; });
+    var sched = [];
+    for (var w = 0; w < s.weeks; w++) {
+      var date = addDays(s.start, w*7);
+      var month = date.slice(0,7);
+      var week = { date: date, svcs: s.services.map(function(n){
+        var slots = [], i;
+        for (i=0;i<s.leads;i++) slots.push({role:"Lead", vid:null});
+        for (i=0;i<s.helpers;i++) slots.push({role:"Helper", vid:null});
+        return { name:n, slots:slots };
+      })};
+      var usedThisWeek = {};
+      var order = [["Lead"],["Helper"]];
+      order.forEach(function(roleSet){
+        week.svcs.forEach(function(svc){
+          svc.slots.forEach(function(slot){
+            if (slot.role !== roleSet[0]) return;
+            var cands = state.vols.filter(function(v){
+              if (slot.role === "Lead" && !v.lead) return false;
+              if ((v.off||[]).indexOf(date) >= 0) return false;
+              if (s.one && usedThisWeek[v.id]) return false;
+              for (var k=0;k<svc.slots.length;k++) if (svc.slots[k].vid === v.id) return false;
+              if ((monthCounts[v.id+month]||0) >= (v.max||2)) return false;
+              return true;
+            });
+            cands.forEach(function(v){
+              var score = counts[v.id] * 10;
+              if (s.back && last[v.id] === w-1) score += 25;
+              if (slot.role === "Helper" && v.lead) score += 4;
+              v._score = score + Math.random();
+            });
+            cands.sort(function(a,b){ return a._score - b._score; });
+            if (cands.length) {
+              var pick = cands[0];
+              slot.vid = pick.id;
+              usedThisWeek[pick.id] = true;
+              counts[pick.id]++; monthCounts[pick.id+month] = (monthCounts[pick.id+month]||0)+1;
+              last[pick.id] = w;
+            }
+          });
+        });
+      });
+      sched.push(week);
+    }
+    state.schedule = sched;
+    save(); renderSchedule();
+  }
+
+  /* ---------- schedule display ---------- */
+  function renderSchedule(){
+    var box = $("weeks"); box.textContent = "";
+    var sched = state.schedule;
+    if (!sched) {
+      box.appendChild(el("p", {class:"hint", text:"Press Build schedule to fill the rota from your volunteers and settings."}));
+      $("status").textContent = ""; renderLoad(); return;
+    }
+    var open = 0;
+    sched.forEach(function(w, wi){
+      var week = el("div", {class:"week"});
+      var wOpen = 0;
+      var body = el("div", {class:"svcs"});
+      w.svcs.forEach(function(svc, si){
+        var col = el("div", {class:"svc"}, [el("div", {class:"svc-name", text:svc.name})]);
+        svc.slots.forEach(function(sl, sli){
+          var sel = el("select", {id:"sl-"+wi+"-"+si+"-"+sli, "aria-label":sl.role+" for "+svc.name+" on "+pretty(w.date)});
+          sel.appendChild(el("option", {value:"", text:"Open"}));
+          state.vols.forEach(function(v){
+            if (sl.role === "Lead" && !v.lead) return;
+            var off = (v.off||[]).indexOf(w.date) >= 0;
+            if (off && sl.vid !== v.id) return;
+            var busy = false;
+            w.svcs.forEach(function(s2){ s2.slots.forEach(function(x){ if (x !== sl && x.vid === v.id) busy = true; }); });
+            var label = (v.name || "(unnamed)") + (busy ? " (already serving)" : "") + (off ? " (unavailable)" : "");
+            var o = el("option", {value:v.id, text:label});
+            if (sl.vid === v.id) o.selected = true;
+            sel.appendChild(o);
+          });
+          if (!sl.vid) { sel.className = "open"; wOpen++; open++; }
+          sel.addEventListener("change", function(e){ sl.vid = e.target.value || null; save(); renderSchedule(); });
+          col.appendChild(el("div", {class:"slot"}, [
+            el("span", {class:"tag " + (sl.role === "Lead" ? "lead" : "help"), text:sl.role}), sel
+          ]));
+        });
+        body.appendChild(col);
+      });
+      week.appendChild(el("div", {class:"week-head"}, [
+        document.createTextNode(pretty(w.date)),
+        el("span", {text: wOpen ? wOpen + " open" : "Fully staffed"})
+      ]));
+      week.appendChild(body);
+      box.appendChild(week);
+    });
+    $("status").textContent = open ? open + " open spot" + (open>1?"s":"") + ". Add volunteers or availability, then rebuild." : "Every spot is filled.";
+    renderLoad();
+  }
+
+  function renderLoad(){
+    var box = $("load"); box.textContent = "";
+    var counts = {}, max = 1;
+    state.vols.forEach(function(v){ counts[v.id] = 0; });
+    if (state.schedule) state.schedule.forEach(function(w){ w.svcs.forEach(function(s){ s.slots.forEach(function(sl){ if (sl.vid && counts[sl.vid] != null) counts[sl.vid]++; }); }); });
+    state.vols.forEach(function(v){ if (counts[v.id] > max) max = counts[v.id]; });
+    if (!state.vols.length) { box.appendChild(el("p", {class:"hint", text:"Add volunteers to see how turns are shared."})); return; }
+    state.vols.forEach(function(v){
+      var fill = el("i"); fill.style.width = (counts[v.id] / max * 100) + "%";
+      box.appendChild(el("div", {class:"load-row"}, [
+        el("span", {text:v.name || "(unnamed)"}), el("div", {class:"bar"}, [fill]), el("b", {text:String(counts[v.id])})
+      ]));
+    });
+  }
+
+  /* ---------- copy ---------- */
+  function asText(){
+    if (!state.schedule) return "";
+    var out = ["Nursery schedule"];
+    state.schedule.forEach(function(w){
+      out.push("", pretty(w.date));
+      w.svcs.forEach(function(s){
+        var names = s.slots.map(function(sl){ var v = sl.vid && volById(sl.vid); return (v ? v.name : "OPEN") + " (" + sl.role + ")"; });
+        out.push("  " + s.name + ": " + names.join(", "));
+      });
+    });
+    return out.join("\n");
+  }
+  function copy(){
+    var text = asText();
+    if (!text) { toast("Build a schedule first"); return; }
+    var box = $("copybox");
+    function fallback(){ box.hidden = false; box.value = text; box.focus(); box.select(); toast("Select and copy the text below"); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function(){ box.hidden = true; toast("Copied"); }, fallback);
+    } else fallback();
+  }
+
+  /* ---------- wire up ---------- */
+  load();
+  writeSettings(); renderVols(); renderSchedule();
+  ["s-start","s-weeks","s-svcs","s-leads","s-helpers","s-one","s-back"].forEach(function(id){
+    $(id).addEventListener("change", function(){ readSettings(); save(); });
+  });
+  $("btn-generate").addEventListener("click", function(){ generate(); toast("Schedule built"); });
+  $("btn-copy").addEventListener("click", copy);
+  $("btn-add").addEventListener("click", function(){
+    if (state.example) { state.vols = []; state.example = false; }
+    state.vols.push({ id:nid(), name:"", lead:false, max:2, off:[] });
+    save(); renderVols(); renderSchedule();
+    var last = state.vols[state.vols.length-1]; var f = $("n-"+last.id); if (f) f.focus();
+  });
+  $("btn-clear").addEventListener("click", function(){
+    state.vols = []; state.example = false; state.schedule = null; save(); renderVols(); renderSchedule();
+  });
+  if (!state.schedule) generate();
+})();
+</script>
+
+</body>
+</html>
