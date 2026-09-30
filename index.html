@@ -91,6 +91,21 @@ button.ghost:hover{color:var(--warn);border-color:transparent}
 #toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:6px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
 #toast.on{opacity:1}
 @media (prefers-reduced-motion:reduce){#toast{transition:none}}
+.file-btn{position:relative;overflow:hidden}
+.file-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+@media print{
+  body{background:#fff;padding:0}
+  header .actions, #banner, #h-setup, #s-start, #s-weeks, #s-svcs, #s-leads, #s-helpers,
+  .panel:has(#h-setup) .row, .panel:has(#h-setup) textarea, .panel:has(#h-setup) .check,
+  .panel:has(#h-setup) .hint, .panel:has(#h-vols), .panel:has(#h-load), header p,
+  .slot select{display:none!important}
+  .grid{display:block}
+  .panel{border:0;padding:0}
+  .week{break-inside:avoid;border-color:#ccc;margin-bottom:10px}
+  .week-head{background:#f2f2f2}
+  .slot::after{content:attr(data-name);font-size:14px}
+  .tag{background:#eee!important;color:#000!important}
+}
 </style>
 </head>
 <body>
@@ -104,6 +119,8 @@ button.ghost:hover{color:var(--warn);border-color:transparent}
     <div class="actions">
       <button id="btn-generate" class="primary" type="button">Build schedule</button>
       <button id="btn-copy" type="button">Copy as text</button>
+      <button id="btn-csv" type="button">Download CSV</button>
+      <button id="btn-print" type="button">Print</button>
     </div>
   </header>
 
@@ -133,6 +150,8 @@ button.ghost:hover{color:var(--warn);border-color:transparent}
           <div class="actions">
             <button id="btn-add" type="button">Add volunteer</button>
             <button id="btn-clear" class="ghost" type="button">Remove all</button>
+            <button id="btn-export" class="ghost" type="button">Back up data</button>
+            <span class="file-btn"><button class="ghost" type="button">Restore backup</button><input id="btn-import" type="file" accept="application/json" aria-label="Restore backup file"></span>
           </div>
         </div>
         <div id="vols" class="vols"></div>
@@ -371,7 +390,8 @@ button.ghost:hover{color:var(--warn);border-color:transparent}
           });
           if (!sl.vid) { sel.className = "open"; wOpen++; open++; }
           sel.addEventListener("change", function(e){ sl.vid = e.target.value || null; save(); renderSchedule(); });
-          col.appendChild(el("div", {class:"slot"}, [
+          var pickedName = (sl.vid && volById(sl.vid) && volById(sl.vid).name) || "Open";
+          col.appendChild(el("div", {class:"slot", "data-name":pickedName}, [
             el("span", {class:"tag " + (sl.role === "Lead" ? "lead" : "help"), text:sl.role}), sel
           ]));
         });
@@ -426,6 +446,47 @@ button.ghost:hover{color:var(--warn);border-color:transparent}
     } else fallback();
   }
 
+  /* ---------- file downloads ---------- */
+  function downloadFile(name, text, type){
+    var blob = new Blob([text], {type: type});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+  function csvCell(v){ return '"' + String(v).replace(/"/g,'""') + '"'; }
+  function asCsv(){
+    var rows = [["Date","Service","Role","Volunteer"]];
+    state.schedule.forEach(function(w){
+      w.svcs.forEach(function(s){
+        s.slots.forEach(function(sl){
+          var v = sl.vid && volById(sl.vid);
+          rows.push([pretty(w.date), s.name, sl.role, v ? v.name : "OPEN"]);
+        });
+      });
+    });
+    return rows.map(function(r){ return r.map(csvCell).join(","); }).join("\r\n");
+  }
+  function exportData(){
+    downloadFile("nursery-rota-backup.json", JSON.stringify(state, null, 2), "application/json");
+    toast("Backup downloaded");
+  }
+  function importData(file){
+    var reader = new FileReader();
+    reader.onload = function(){
+      try {
+        var s = JSON.parse(reader.result);
+        if (!s || !s.settings || !s.vols) throw new Error("bad file");
+        state = s; state.example = false;
+        save(); writeSettings(); renderVols(); renderSchedule();
+        toast("Backup restored");
+      } catch(e){ toast("That file isn't a nursery rota backup"); }
+    };
+    reader.onerror = function(){ toast("Couldn't read that file"); };
+    reader.readAsText(file);
+  }
+
   /* ---------- wire up ---------- */
   load();
   writeSettings(); renderVols(); renderSchedule();
@@ -434,6 +495,20 @@ button.ghost:hover{color:var(--warn);border-color:transparent}
   });
   $("btn-generate").addEventListener("click", function(){ generate(); toast("Schedule built"); });
   $("btn-copy").addEventListener("click", copy);
+  $("btn-csv").addEventListener("click", function(){
+    if (!state.schedule) { toast("Build a schedule first"); return; }
+    downloadFile("nursery-rota.csv", asCsv(), "text/csv");
+  });
+  $("btn-print").addEventListener("click", function(){
+    if (!state.schedule) { toast("Build a schedule first"); return; }
+    window.print();
+  });
+  $("btn-export").addEventListener("click", exportData);
+  $("btn-import").addEventListener("change", function(e){
+    var f = e.target.files && e.target.files[0];
+    if (f) importData(f);
+    e.target.value = "";
+  });
   $("btn-add").addEventListener("click", function(){
     if (state.example) { state.vols = []; state.example = false; }
     state.vols.push({ id:nid(), name:"", lead:false, max:2, off:[] });
