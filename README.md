@@ -2,7 +2,7 @@
 
 A single-page tool for building a fair rotating volunteer schedule for a church nursery. No build step, no dependencies, no server.
 
-## Use it
+## Use it  
 
 Open `index.html` in a browser, or publish it with GitHub Pages (Settings > Pages > Deploy from branch > `main` / root).
 
