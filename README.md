@@ -10,7 +10,7 @@ Open `index.html` in a browser, or publish it with GitHub Pages (Settings > Page
 2. Add volunteers, mark who is lead-qualified, and add the dates each person cannot serve.
 3. Press **Build schedule**. Change any spot from its dropdown, then use **Copy as text** to share it.
 
-Data is stored only in your browser (localStorage). It is not sent anywhere.
+Data is stored only in your browser (localStorage). It is not sent anywhere. 
 
 ## Scheduling rules
 
